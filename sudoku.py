@@ -54,19 +54,34 @@ def swap_columns_area(field):
     return transpose(field)
 
 
+def get_random_square(field, square_num):
+    j = 0
+    for i in range(81 - square_num):
+        row = random.randrange(0, 9, 1)
+        columns = random.randrange(0, 9, 1)
+        if field[row][columns] != '_':
+            field[row][columns] = '_'
+            j += 1
+        else:
+            field = get_random_square(field, square_num + j)
+    return field
+
+
 class Sudoku:
     def __init__(self, mode, field_size):
         self.mode = mode
         self.field = self.make_field(field_size)
 
-    def make_field(self, field_size):
+    @staticmethod
+    def make_field(field_size):
         base_field = [[((i*3 + i/3 + j) % (3*3) + 1) for j in range(3*3)] for i in range(3*3)]
         shuffle_func = ['transpose(base_field)', 'swap_rows_small(base_field)',
                         'swap_columns_small(base_field)', 'swap_rows_area(base_field)',
                         'swap_columns_area(base_field)']
         for _ in range(10):
             base_field = eval(shuffle_func[random.randrange(0, len(shuffle_func), 1)])
-        return base_field
+        new_field = get_random_square(base_field, 81 - field_size)
+        return new_field
 
 
 class AISudoku(Sudoku):
